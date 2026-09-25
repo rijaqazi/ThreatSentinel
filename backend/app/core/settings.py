@@ -77,6 +77,7 @@ class Settings:
     capture_packet_limit: int
     capture_cooldown_seconds: int
     detector_alert_log_path: Path
+    detector_alert_poll_seconds: int
     ioc_output_file: Path
     ioc_whitelist_file: Path
     ioc_poll_seconds: int
@@ -119,7 +120,8 @@ class Settings:
             capture_window_seconds=_positive_int("CAPTURE_WINDOW_SECONDS", 10),
             capture_packet_limit=_positive_int("CAPTURE_PACKET_LIMIT", 200),
             capture_cooldown_seconds=_positive_int("CAPTURE_COOLDOWN_SECONDS", 5),
-            detector_alert_log_path=_project_path("DETECTOR_ALERT_LOG_PATH", PROJECT_ROOT / "new_detection" / "alerts.log"),
+            detector_alert_log_path=_project_path("DETECTOR_ALERT_LOG_PATH", PROJECT_ROOT / "data" / "detector_output" / "alerts.log"),
+            detector_alert_poll_seconds=_positive_int("DETECTOR_ALERT_POLL_SECONDS", 5),
             ioc_output_file=_project_path("IOC_EXTRACTION_OUTPUT", PROJECT_ROOT / "data" / "iocs" / "latest_iocs.json"),
             ioc_whitelist_file=_project_path("IOC_WHITELIST_FILE", PROJECT_ROOT / "data" / "iocs" / "whitelist.json"),
             ioc_poll_seconds=_positive_int("IOC_POLL_SECONDS", 30),

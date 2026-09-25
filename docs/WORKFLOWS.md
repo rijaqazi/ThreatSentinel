@@ -6,6 +6,7 @@ Use these commands as the canonical entry points. The older filenames remain as 
 |---|---|---|
 | Local network services | `python3 scripts/launcher.py all` | `python3 agent/run.py` |
 | Full threat-processing pipeline | `python3 scripts/launcher.py all pipeline` | — |
+| Detector watchers and alert ingestion | `python3 scripts/launcher.py detector-nmap detector-arp detector-icmp alerts` | `python3 new_detection/new2.py --detector NAME` |
 | PCAP parser watcher | `python3 scripts/launcher.py capture` | `python3 new_detection/auto_parse.py` |
 | Live protocol capture | `python3 -m backend.app.workers.capture.protocol_monitor --interface INTERFACE` | `python3 new_detection/monitor_tshark_trigger.py --interface INTERFACE` |
 | Parsed-JSON detector watcher | `python3 -m backend.app.workers.detectors.json_watch --once` | `python3 new_detection/new2.py --once` |

@@ -18,6 +18,8 @@ def parse_alert_line(line):
     alert_type = _match(r"(?:^|\s)-\s*(.*?)\s+ALERT\s+from\s", line)
     if not alert_type:
         alert_type = _match(r"\[ALERT\]\s*(.*?)\s+from\s", line)
+    if alert_type:
+        alert_type = alert_type.lstrip("- ")
     return {
         "timestamp": _match(r"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})", line),
         "alert_type": alert_type,

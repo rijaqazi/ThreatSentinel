@@ -1,5 +1,7 @@
 """CVSS scoring rules for supported ThreatSentinel alert types."""
 
+import re
+
 
 CVSS_VECTORS = {
     "ARP_MITM": "AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
@@ -33,6 +35,8 @@ ATTACK_MAPPING = {
     "FIN SCAN": "FIN_SCAN", "XMAS SCAN": "XMAS_SCAN", "UDP SCAN": "UDP_SCAN",
     "OS FINGERPRINT": "OS_FINGERPRINT", "FULL_PORT_SCAN": "FULLPORT_SCAN",
     "ACK SCAN": "ACK_SCAN", "SPOOFED_SYN_FLOOD": "SPOOFED_SYN_FLOOD",
+    "ARP_SPOOF": "ARP_SPOOFING", "CACHE_OVERRIDE": "ARP_MITM",
+    "SMURF_ATTACK": "ICMP_SMURF_ATTACK",
 }
 
 
@@ -67,7 +71,8 @@ def get_priority(score):
 
 def process_alert(alert):
     raw_type = str(alert.get("alert_type", "")).strip().upper()
-    attack_type = ATTACK_MAPPING.get(raw_type, raw_type)
+    normalized_type = re.sub(r"[\s-]+", "_", raw_type)
+    attack_type = ATTACK_MAPPING.get(raw_type, ATTACK_MAPPING.get(normalized_type, normalized_type))
     vector = CVSS_VECTORS.get(attack_type)
     score = calculate_cvss_score(vector) if vector else 0.0
     return {

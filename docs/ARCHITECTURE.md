@@ -25,6 +25,7 @@ backend/app/
 | `Rule_Generation` upload/report scripts | rules and reports services | Wrappers retained |
 | `nmap/`, `arp/`, `icmp/` | detector workers | Compatibility commands retained |
 | `new_detection/` capture scripts | capture workers and JSON watcher | Compatibility commands retained |
+| detector alert logs | alert-log ingestion worker and normalized MongoDB alerts | Started by `pipeline` |
 
 ## UI boundary
 

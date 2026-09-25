@@ -29,3 +29,17 @@ class LauncherTests(unittest.TestCase):
 
         command = popen.call_args.args[0]
         self.assertEqual(command[-1], "monitor")
+
+    @patch("scripts.launcher.time.sleep")
+    @patch("scripts.launcher.subprocess.Popen")
+    def test_detector_service_uses_the_selected_detector(self, popen, _sleep):
+        process = popen.return_value
+        process.poll.return_value = None
+
+        launcher.start_service("detector-arp")
+
+        command = popen.call_args.args[0]
+        self.assertEqual(command[1:], ["-m", "backend.app.workers.detectors.json_watch", "--detector", "arp"])
+
+    def test_pipeline_includes_detector_and_alert_workers(self):
+        self.assertTrue({"detector-nmap", "detector-arp", "detector-icmp", "alerts"}.issubset(launcher.PIPELINE_SERVICES))

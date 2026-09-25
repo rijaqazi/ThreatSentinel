@@ -8,6 +8,8 @@ import uuid
 from collections import defaultdict
 from pathlib import Path
 
+from ..alerts.alert_log_parser import parse_alert_line
+
 
 IOC_KEYS = ("ip_addresses", "mac_addresses", "domains", "urls", "hashes")
 IP_CANDIDATE = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b")
@@ -88,19 +90,17 @@ def parse_alerts(log_file):
     except OSError:
         return alerts
     for line in lines:
-        if not line.startswith("[ALERT]"):
+        parsed = parse_alert_line(line)
+        if not parsed:
             continue
-        def capture(pattern, default=""):
-            match = re.search(pattern, line)
-            return match.group(1) if match else default
         alerts.append({
-            "type": capture(r"\[ALERT\]\s+([^\s]+)", "Unknown"),
-            "src_ip": capture(r"from\s+([\d.]+)", None),
-            "target_ip": capture(r"Target_IP:\s*([^\s|]+)", "N/A"),
-            "src_mac": capture(r"SRC_MAC:\s*([^\s|]+)", None),
+            "type": parsed["alert_type"] or "Unknown",
+            "src_ip": parsed["src_ip"],
+            "target_ip": parsed["target_ip"],
+            "src_mac": parsed["src_mac"],
             "details": {
-                "ports": capture(r"Ports:\s*([^\s|]+)"),
-                "duration": capture(r"Duration:\s*([^\s|]+)", "0"),
+                "ports": ",".join(parsed["ports"]),
+                "duration": str(parsed["duration_sec"]),
                 "raw_log": line,
             },
         })

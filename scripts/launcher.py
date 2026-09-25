@@ -41,6 +41,33 @@ SERVICE_DEFINITIONS = {
         "cwd": PROJECT_ROOT,
         "port": None,
     },
+    "detector-nmap": {
+        "label": "Nmap detector watcher",
+        "module": "backend.app.workers.detectors.json_watch",
+        "args": ["--detector", "nmap"],
+        "cwd": PROJECT_ROOT,
+        "port": None,
+    },
+    "detector-arp": {
+        "label": "ARP detector watcher",
+        "module": "backend.app.workers.detectors.json_watch",
+        "args": ["--detector", "arp"],
+        "cwd": PROJECT_ROOT,
+        "port": None,
+    },
+    "detector-icmp": {
+        "label": "ICMP detector watcher",
+        "module": "backend.app.workers.detectors.json_watch",
+        "args": ["--detector", "icmp"],
+        "cwd": PROJECT_ROOT,
+        "port": None,
+    },
+    "alerts": {
+        "label": "detector alert ingestion worker",
+        "module": "backend.app.workers.alert_log_ingestion",
+        "cwd": PROJECT_ROOT,
+        "port": None,
+    },
     "cvss": {
         "label": "CVSS scoring worker",
         "script": PROJECT_ROOT / "cvss" / "cvss_automation.py",
@@ -69,7 +96,16 @@ SERVICE_DEFINITIONS = {
 }
 
 DEFAULT_SERVICES = ("upload", "heartbeat", "taxii", "capture")
-PIPELINE_SERVICES = ("cvss", "rules", "ioc", "ingestion")
+PIPELINE_SERVICES = (
+    "detector-nmap",
+    "detector-arp",
+    "detector-icmp",
+    "alerts",
+    "cvss",
+    "rules",
+    "ioc",
+    "ingestion",
+)
 
 
 def port_is_available(port):

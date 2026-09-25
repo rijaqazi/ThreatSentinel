@@ -13,3 +13,8 @@ class CvssServiceTests(unittest.TestCase):
         result = process_alert({"_id": "1", "alert_type": "ARP MITM"})
         self.assertEqual(result["attack_type"], "ARP_MITM")
         self.assertIn(result["priority"], {"Critical", "High", "Medium", "Low"})
+
+    def test_detector_style_alert_type_is_normalized(self):
+        result = process_alert({"_id": "1", "alert_type": "ICMP Echo Request Flood"})
+        self.assertEqual(result["attack_type"], "ICMP_ECHO_REQUEST_FLOOD")
+        self.assertGreater(result["cvss_score"], 0)

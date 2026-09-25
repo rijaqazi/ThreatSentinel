@@ -21,7 +21,7 @@ This starts the secure upload server, heartbeat API, TAXII server, and PCAP pars
 python3 scripts/launcher.py all pipeline
 ```
 
-`pipeline` adds the CVSS scoring, rule-generation, IOC/STIX generation, and STIX-ingestion workers. Use this only when MongoDB is configured through `MONGODB_URI`.
+`pipeline` adds the Nmap, ARP, and ICMP detector watchers; detector-alert ingestion; CVSS scoring; rule generation; IOC/STIX generation; and STIX ingestion. Use this only when MongoDB is configured through `MONGODB_URI`.
 
 Press `Ctrl+C` once to stop every process started by the launcher.
 
