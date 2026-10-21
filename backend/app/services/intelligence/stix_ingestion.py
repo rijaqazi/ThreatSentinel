@@ -72,3 +72,7 @@ def monitor(interval=30):
 
 def main():
     monitor()
+
+
+if __name__ == "__main__":
+    main()
