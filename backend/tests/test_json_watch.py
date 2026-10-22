@@ -22,5 +22,5 @@ class JsonWatchTests(unittest.TestCase):
                 return type("Result", (), {"returncode": 0})()
 
             run_detector("nmap", source, root / "out", runner)
-            self.assertIn("nmap_detector.py", commands[0][0][1])
+            self.assertEqual(commands[0][0][1:3], ["-m", "backend.app.workers.detectors.nmap_detector"])
             self.assertFalse(commands[0][1].get("shell", False))
