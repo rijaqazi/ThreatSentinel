@@ -44,6 +44,10 @@ rules_dict = {
     "smurf_attack": "Smurf Attack"
 }
 
+# The sidebar has multiple comboboxes, so keep the currently displayed rule
+# independently of the widget that was used to select it.
+selected_rule_id = None
+
 
 def sha256_file(path):
     """Calculate SHA256 hash of a file"""
@@ -296,24 +300,11 @@ def generate_files_for_rule(rule_id, rule_content):
 
 
 def save_rule():
-    """Save the currently selected rule with zip creation and server upload"""
-    # Get the current tab
-    current_tab = notebook.index(notebook.select())
-    tab_name = notebook.tab(current_tab, "text").lower()
-    
-    # Get the selected rule from the combobox
-    if tab_name == "nmap":
-        rule_id = nmap_combobox.get()
-    elif tab_name == "arp":
-        rule_id = arp_combobox.get()
-    elif tab_name == "icmp":
-        rule_id = icmp_combobox.get()
-    else:
-        messagebox.showerror("Error", "Invalid tab selected!")
-        return
+    """Save the displayed rule, then create its export ZIP."""
+    rule_id = selected_rule_id
 
     if not rule_id:
-        messagebox.showerror("Error", "Please select a rule first!")
+        messagebox.showerror("Error", "Please select a rule first.")
         return
 
     rule_text = text_area.get("1.0", tk.END).strip()
@@ -323,8 +314,33 @@ def save_rule():
 
     try:
         parsed = json.loads(rule_text)
-    except Exception:
-        parsed = rule_text
+    except json.JSONDecodeError as exc:
+        messagebox.showerror("Error", f"Rule content must be valid JSON:\n{exc}")
+        return
+
+    # Persist the user's edit to the canonical rule repository. Write to a
+    # temporary file first so an interrupted save cannot corrupt the rule.
+    rule_path = os.path.join(RULES_REPO_DIR, f"{rule_id}.json")
+    temporary_path = f"{rule_path}.tmp"
+    try:
+        with open(temporary_path, "w", encoding="utf-8") as file_handle:
+            json.dump(parsed, file_handle, indent=4)
+            file_handle.write("\n")
+        os.replace(temporary_path, rule_path)
+    except OSError as exc:
+        try:
+            if os.path.exists(temporary_path):
+                os.remove(temporary_path)
+        except OSError:
+            pass
+        messagebox.showerror("Error", f"Could not save {rule_id}:\n{exc}")
+        return
+
+    for category in categorized_rules.values():
+        for rules_list in category.values():
+            for rule_data in rules_list:
+                if rule_data["rule_id"] == rule_id:
+                    rule_data["data"] = parsed
 
     # Generate files, create zip and upload to server
     out_json, upload_success = generate_files_for_rule(rule_id, parsed)
@@ -348,9 +364,11 @@ def update_rule():
 
 def show_rule(event, category, combobox):
     """Display selected rule in text area"""
+    global selected_rule_id
     rule_id = combobox.get()
     if not rule_id:
         return
+    selected_rule_id = rule_id
 
     # Find rule in categorized data
     for rule_type, rules_list in categorized_rules[category].items():
@@ -382,6 +400,7 @@ def show_rule(event, category, combobox):
 
 def search_rule():
     """Search for rules by Rule ID"""
+    global selected_rule_id
     search_term = search_entry.get().strip()
     if not search_term:
         messagebox.showinfo("Search", "Please enter a Rule ID to search")
@@ -401,21 +420,11 @@ def search_rule():
             break
     
     if found_rule:
+        selected_rule_id = found_rule["rule_id"]
         # Display the found rule
         rule_label.config(text=f"📋 Rule: {found_rule['rule_id']}")
         text_area.delete("1.0", tk.END)
         text_area.insert(tk.END, json.dumps(found_rule['data'], indent=2))
-        
-        # Select in appropriate combobox
-        if found_rule['rule_id'] in [rule['rule_id'] for rule in sum(categorized_rules['nmap'].values(), [])]:
-            notebook.select(nmap_tab)
-            nmap_combobox.set(found_rule['rule_id'])
-        elif found_rule['rule_id'] in [rule['rule_id'] for rule in sum(categorized_rules['arp'].values(), [])]:
-            notebook.select(arp_tab)
-            arp_combobox.set(found_rule['rule_id'])
-        elif found_rule['rule_id'] in [rule['rule_id'] for rule in sum(categorized_rules['icmp'].values(), [])]:
-            notebook.select(icmp_tab)
-            icmp_combobox.set(found_rule['rule_id'])
         
         messagebox.showinfo("Search Result", f"Rule found: {found_rule['rule_id']}")
     else:
@@ -702,10 +711,12 @@ status_label.pack(side="left", padx=15, pady=10)
 
 # Auto-load first rule if available
 def auto_load_first_rule():
+    global selected_rule_id
     for category in categorized_rules.values():
         for rule_type, rules_list in category.items():
             if rules_list:
                 first_rule = rules_list[0]
+                selected_rule_id = first_rule["rule_id"]
                 rule_label.config(text=f"📋 Rule: {first_rule['rule_id']}")
                 text_area.delete("1.0", tk.END)
                 text_area.insert(tk.END, json.dumps(first_rule['data'], indent=2))
