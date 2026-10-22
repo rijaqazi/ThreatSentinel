@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications - ThreatSentinel</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-bg: #0a0a14;
+      --secondary-bg: #12121e;
+      --card-bg: #1a1a2e;
+      --accent-color: #ff6a00;
+      --accent-hover: #ff8533;
+      --text-primary: #ffffff;
+      --text-secondary: #b0b0b0;
+      --border-color: #2a2a3c;
+    }
+    
+    body {
+      background-color: var(--primary-bg);
+      color: var(--text-primary);
+      font-family: 'Montserrat', 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .app-container {
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    /* Sidebar Styles - Same as alerts.html */
+    .sidebar {
+      width: 280px;
+      background-color: var(--secondary-bg);
+      padding: 1.5rem 1rem;
+      border-right: 1px solid var(--border-color);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+      z-index: 100;
+    }
+    
+    .sidebar-header {
+      padding: 0 0.5rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 1rem;
+    }
+    
+    .sidebar-header h4 {
+      color: var(--text-primary);
+      font-weight: 700;
+      margin: 0;
+    }
+    
+    .sidebar-header span {
+      color: var(--accent-color);
+    }
+    
+    .nav-item {
+      margin: 8px 0;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-item:hover {
+      background-color: rgba(255, 106, 0, 0.1);
+    }
+    
+    .nav-link {
+      color: var(--text-secondary);
+      padding: 0.75rem 1rem;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-link:hover, .nav-link.active {
+      color: var(--text-primary);
+      background-color: var(--accent-color);
+    }
+    
+    .nav-link i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+    
+    /* Main Content Styles */
+    .main-content {
+      flex: 1;
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+    }
+    
+    .page-header {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .page-title {
+      color: var(--accent-color);
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    
+    .page-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    
+    
+    .card-custom {
+      background-color: var(--card-bg);
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+    
+    .card-header-custom {
+      background-color: rgba(255, 106, 0, 0.1);
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .card-title {
+      color: var(--accent-color);
+      font-weight: 600;
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    
+    .card-body {
+      padding: 1.5rem;
+    }
+    
+    /* Notification Styles */
+    .notification-item {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .notification-item:hover {
+      border-color: var(--accent-color);
+      transform: translateY(-2px);
+    }
+    
+    .notification-critical {
+      border-left: 5px solid #ff4444;
+    }
+    
+    .notification-warning {
+      border-left: 5px solid #ff9800;
+    }
+    
+    .notification-info {
+      border-left: 5px solid #2196F3;
+    }
+    
+    .notification-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
+    }
+    
+    .notification-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .notification-time {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+    
+    .notification-content {
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+      line-height: 1.5;
+    }
+    
+    .notification-source {
+      font-size: 0.85rem;
+      color: var(--accent-color);
+      margin-bottom: 0.5rem;
+    }
+    
+    .notification-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    
+    .notification-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    
+    .notification-btn:hover {
+      background-color: var(--accent-color);
+      color: white;
+      border-color: var(--accent-color);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+    }
+    
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--border-color);
+    }
+    
+    /* Search and Filter */
+    .search-box {
+      display: flex;
+      margin-bottom: 1rem;
+    }
+    
+    .search-input {
+      flex: 1;
+      background-color: var(--secondary-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 0.5rem 1rem;
+      border-radius: 6px 0 0 6px;
+      outline: none;
+    }
+    
+    .search-btn {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0 6px 6px 0;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    
+    .search-btn:hover {
+      background-color: var(--accent-hover);
+    }
+    
+    /* Table info text */
+    .table-info {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    
+    /* Responsive Adjustments - Same as alerts.html */
+    @media (max-width: 992px) {
+      .app-container {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        height: auto;
+        padding: 1rem;
+      }
+      
+      .nav-items {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+      }
+      
+      .nav-item {
+        margin: 0 5px;
+        white-space: nowrap;
+      }
+      
+      .main-content {
+        padding: 1rem;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 1rem;
+      }
+      
+      .page-title {
+        font-size: 1.5rem;
+      }
+      
+      .card-header-custom {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+      
+      .notification-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+      
+      .notification-time {
+        align-self: flex-start;
+      }
+      
+      .notification-actions {
+        flex-wrap: wrap;
+      }
+      
+      .notification-btn {
+        flex: 1;
+        min-width: 120px;
+        justify-content: center;
+      }
+      
+      .search-box {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .search-input, .search-btn {
+        border-radius: 6px;
+        width: 100%;
+      }
+      
+      .search-input {
+        border-right: 1px solid var(--border-color);
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .page-title {
+        font-size: 1.3rem;
+      }
+      
+      .sidebar-header h4 {
+        font-size: 1.3rem;
+      }
+      
+      .nav-link {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+      }
+      
+      .nav-link i {
+        margin-right: 8px;
+        font-size: 0.9rem;
+      }
+      
+      .search-input, .search-btn {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+      }
+      
+      .notification-item {
+        padding: 0.8rem;
+      }
+      
+      .notification-title {
+        font-size: 0.95rem;
+      }
+      
+      .notification-content {
+        font-size: 0.9rem;
+      }
+      
+      .notification-btn {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.6rem;
+      }
+      
+      .empty-state {
+        padding: 1.5rem;
+      }
+      
+      .empty-state i {
+        font-size: 2.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h4>Threat<span>Sentinel</span></h4>
+      </div>
+      
+      <div class="nav-items">
+        <div class="nav-item"><a href="infosec_main.html" class="nav-link"><i class="fas fa-chart-dashboard"></i> Dashboard</a></div>
+        <div class="nav-item"><a href="/infosec_ioc_list.html" class="nav-link"><i class="fas fa-list"></i> IOC List</a></div>
+        <div class="nav-item"><a href="/infosec_alerts.html" class="nav-link"><i class="fas fa-bell"></i> Alerts</a></div>
+        <div class="nav-item"><a href="/infosec_notification.html" class="nav-link active"><i class="fas fa-bell"></i> Notifications</a></div>
+        <div class="nav-item">
+          <a href="infosec_report.html" class="nav-link">
+            <i class="fas fa-file-alt"></i> Report
+          </a>
+        </div>
+        <div class="nav-item"><a href="/infosec_settings.html" class="nav-link"><i class="fas fa-cog"></i> Settings</a></div>
+        <div class="nav-item">
+          <a href="{{ url_for('home') }}" class="nav-link">
+            <i class="fas fa-sign-out-alt"></i> Log Out
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="page-header">
+        <h1 class="page-title">Notifications</h1>
+        <p class="page-subtitle">All security alerts and notifications</p>
+      </div>
+
+      <div class="search-box">
+        <input type="text" class="search-input" placeholder="Search notifications...">
+        <button class="search-btn"><i class="fas fa-search"></i></button>
+      </div>
+
+      <div class="card-custom">
+        <div class="card-header-custom">
+          <h5 class="card-title">Notification History</h5>
+          <div class="table-info">
+            <span id="notification-count">0</span> notifications
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="notifications-container">
+            <!-- Notifications will be loaded here -->
+            <div class="empty-state">
+              <i class="fas fa-bell-slash"></i>
+              <h4>No notifications yet</h4>
+              <p>Security alerts will appear here when detected</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    
+    let allNotifications = [];
+    let currentFilter = 'all';
+
+    // Load notifications from localStoragefunction loadNotifications() {
+      const savedNotifications = localStorage.getItem('threatSentinelNotifications');
+      if (savedNotifications) {
+        allNotifications = JSON.parse(savedNotifications);
+      }
+      renderNotifications();
+    }
+
+   
+    function saveNotifications() {
+      localStorage.setItem('threatSentinelNotifications', JSON.stringify(allNotifications));
+    }
+
+   
+    function addNotification(notification) {
+      
+      if (!allNotifications.find(n => n.id === notification.id)) {
+        notification.timestamp = new Date().toISOString();
+        allNotifications.unshift(notification);
+        saveNotifications();
+        renderNotifications();
+      }
+    }
+
+    
+    function removeNotification(id) {
+      allNotifications = allNotifications.filter(notification => notification.id !== id);
+      saveNotifications();
+      renderNotifications();
+    }
+
+    
+    function renderNotifications() {
+      const container = document.getElementById('notifications-container');
+      const countElement = document.getElementById('notification-count');
+      
+     
+      let filteredNotifications = allNotifications;
+      if (currentFilter !== 'all') {
+        filteredNotifications = allNotifications.filter(notification => 
+          notification.type === currentFilter
+        );
+      }
+      
+      
+      countElement.textContent = filteredNotifications.length;
+      
+     
+      if (filteredNotifications.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-bell-slash"></i>
+            <h4>No notifications yet</h4>
+            <p>Security alerts will appear here when detected</p>
+          </div>
+        `;
+        return;
+      }
+      
+      
+      container.innerHTML = filteredNotifications.map(notification => {
+        const time = new Date(notification.timestamp).toLocaleString();
+        let typeClass = '';
+        let typeIcon = '';
+        
+        switch(notification.type) {
+          case 'critical':
+            typeClass = 'notification-critical';
+            typeIcon = '<i class="fas fa-exclamation-circle text-danger"></i>';
+            break;
+          case 'warning':
+            typeClass = 'notification-warning';
+            typeIcon = '<i class="fas fa-exclamation-triangle text-warning"></i>';
+            break;
+          case 'info':
+            typeClass = 'notification-info';
+            typeIcon = '<i class="fas fa-info-circle text-info"></i>';
+            break;
+          default:
+            typeClass = 'notification-info';
+            typeIcon = '<i class="fas fa-info-circle text-info"></i>';
+        }
+        
+        return `
+          <div class="notification-item ${typeClass}">
+            <div class="notification-header">
+              <div class="notification-title">
+                ${typeIcon} ${notification.title || 'Security Alert'}
+              </div>
+              <div class="notification-time">${time}</div>
+            </div>
+            <div class="notification-content">
+              ${notification.message || 'No message provided'}
+            </div>
+            <div class="notification-source">
+              Source: ${notification.source || 'Unknown'}
+            </div>
+            <div class="notification-actions">
+              <button class="notification-btn" onclick="markAsRead('${notification.id}')">
+                <i class="fas fa-check"></i> Mark as Read
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    
+    function markAsRead(id) {
+      // This could be expanded to track read status
+      const notification = allNotifications.find(n => n.id === id);
+      if (notification) {
+        notification.read = true;
+        saveNotifications();
+        renderNotifications();
+      }
+    }
+
+    
+    function searchNotifications() {
+      const searchText = document.querySelector('.search-input').value.toLowerCase();
+      
+      if (!searchText) {
+        renderNotifications();
+        return;
+      }
+      
+      const filteredNotifications = allNotifications.filter(notification => {
+        const title = (notification.title || '').toLowerCase();
+        const message = (notification.message || '').toLowerCase();
+        const source = (notification.source || '').toLowerCase();
+        
+        return title.includes(searchText) || 
+               message.includes(searchText) || 
+               source.includes(searchText);
+      });
+      
+      const container = document.getElementById('notifications-container');
+      const countElement = document.getElementById('notification-count');
+      
+      countElement.textContent = `${filteredNotifications.length} of ${allNotifications.length}`;
+      
+      if (filteredNotifications.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-search"></i>
+            <h4>No matching notifications</h4>
+            <p>Try adjusting your search terms</p>
+          </div>
+        `;
+        return;
+      }
+      
+      
+      container.innerHTML = filteredNotifications.map(notification => {
+        const time = new Date(notification.timestamp).toLocaleString();
+        let typeClass = '';
+        let typeIcon = '';
+        
+        switch(notification.type) {
+          case 'critical':
+            typeClass = 'notification-critical';
+            typeIcon = '<i class="fas fa-exclamation-circle text-danger"></i>';
+            break;
+          case 'warning':
+            typeClass = 'notification-warning';
+            typeIcon = '<i class="fas fa-exclamation-triangle text-warning"></i>';
+            break;
+          case 'info':
+            typeClass = 'notification-info';
+            typeIcon = '<i class="fas fa-info-circle text-info"></i>';
+            break;
+          default:
+            typeClass = 'notification-info';
+            typeIcon = '<i class="fas fa-info-circle text-info"></i>';
+        }
+        
+        return `
+          <div class="notification-item ${typeClass}">
+            <div class="notification-header">
+              <div class="notification-title">
+                ${typeIcon} ${notification.title || 'Security Alert'}
+              </div>
+              <div class="notification-time">${time}</div>
+            </div>
+            <div class="notification-content">
+              ${notification.message || 'No message provided'}
+            </div>
+            <div class="notification-source">
+              Source: ${notification.source || 'Unknown'}
+            </div>
+            <div class="notification-actions">
+              <button class="notification-btn" onclick="markAsRead('${notification.id}')">
+                <i class="fas fa-check"></i> Mark as Read
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    
+    async function checkForNewAlerts() {
+      try {
+        const response = await fetch('/api/recent_alerts');
+        const alerts = await response.json();
+        
+        if (alerts && alerts.length > 0) {
+          alerts.forEach(alert => {
+            addNotification({
+              id: alert.id,
+              title: 'Security Alert',
+              message: `${alert.reason} detected from ${alert.src}`,
+              source: alert.src,
+              type: alert.type || 'warning'
+            });
+          });
+        }
+      } catch (error) {
+        console.error('Error checking for new alerts:', error);
+      }
+    }
+
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load existing notifications
+      loadNotifications();
+      
+      
+      document.querySelector('.search-btn').addEventListener('click', searchNotifications);
+      document.querySelector('.search-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          searchNotifications();
+        }
+      });
+      
+      
+      setInterval(checkForNewAlerts, 10000);
+      
+      // Initial check
+      checkForNewAlerts();
+    });
+
+    
+    if (typeof BroadcastChannel !== 'undefined') {
+      const alertChannel = new BroadcastChannel('threatsentinel_alerts');
+      
+      alertChannel.addEventListener('message', event => {
+        if (event.data.type === 'new_alert') {
+          addNotification(event.data.notification);
+        }
+      });
+    }
+  </script>
+</body>
+</html>

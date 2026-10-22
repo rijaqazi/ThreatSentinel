@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports - ThreatSentinel</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-bg: #000000;
+      --secondary-bg: #12121e;
+      --card-bg: #1a1a2e;
+      --accent-color: #ff6a00;
+      --accent-hover: #ff8533;
+      --text-primary: #ffffff;
+      --text-secondary: #b0b0b0;
+      --border-color: #2a2a3c;
+    }
+   
+    body {
+      background-color: var(--primary-bg);
+      color: var(--text-primary);
+      font-family: 'Montserrat', 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+   
+    .app-container {
+      display: flex;
+      height: 100vh;
+    }
+   
+    
+    .sidebar {
+      width: 280px;
+      background-color: var(--secondary-bg);
+      padding: 1.5rem 1rem;
+      border-right: 1px solid var(--border-color);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      overflow-y: auto;
+    }
+   
+    .sidebar-header {
+      padding: 0 0.5rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 1rem;
+    }
+   
+    .sidebar-header h4 {
+      color: var(--text-primary);
+      font-weight: 700;
+      margin: 0;
+    }
+   
+    .sidebar-header span {
+      color: var(--accent-color);
+    }
+   
+    .nav-item {
+      margin: 8px 0;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+    }
+   
+    .nav-item:hover {
+      background-color: rgba(255, 106, 0, 0.1);
+    }
+   
+    .nav-link {
+      color: var(--text-secondary);
+      padding: 0.75rem 1rem;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+    }
+   
+    .nav-link:hover, .nav-link.active {
+      color: var(--text-primary);
+      background-color: var(--accent-color);
+    }
+   
+    .nav-link i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+   
+    
+    .main-content {
+      flex: 1;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background-color: var(--primary-bg);
+    }
+   
+    .page-header {
+      background-color: var(--secondary-bg);
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+   
+    .page-title {
+      color: var(--accent-color);
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      font-size: 1.5rem;
+    }
+   
+    .page-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+   
+    
+    .content-area {
+      flex: 1;
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+    }
+
+    
+    .search-container {
+      background-color: var(--card-bg);
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .search-box {
+      position: relative;
+      max-width: 400px;
+    }
+
+    .search-input {
+      background-color: var(--secondary-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border-radius: 6px;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 2px rgba(255, 106, 0, 0.2);
+    }
+
+    .search-input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+    }
+   
+    
+    .reports-table {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .table-custom {
+      width: 100%;
+      color: var(--text-primary);
+      border-collapse: collapse;
+    }
+
+    .table-custom th {
+      background-color: rgba(255, 106, 0, 0.15);
+      color: var(--accent-color);
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .table-custom td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: middle;
+    }
+
+    .table-custom tbody tr:hover {
+      background-color: rgba(255, 106, 0, 0.1);
+    }
+   
+    
+    .btn-action {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+      border-radius: 4px;
+      margin-right: 0.5rem;
+      transition: all 0.3s ease;
+    }
+   
+    .btn-view {
+      background-color: rgba(255, 106, 0, 0.2);
+      color: var(--accent-color);
+      border: 1px solid var(--accent-color);
+    }
+   
+    .btn-view:hover {
+      background-color: var(--accent-color);
+      color: var(--text-primary);
+    }
+   
+    .btn-download {
+      background-color: rgba(0, 123, 255, 0.2);
+      color: #0d6efd;
+      border: 1px solid #0d6efd;
+    }
+   
+    .btn-download:hover {
+      background-color: #0d6efd;
+      color: var(--text-primary);
+    }
+   
+    /* Loading Spinner */
+    .loading-spinner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+    }
+    
+    .spinner-border {
+      color: var(--accent-color);
+    }
+    
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-secondary);
+    }
+    
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--border-color);
+    }
+
+    
+    .no-results {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+    }
+   
+    
+    .pdf-frame {
+      flex: 1;
+      width: 100%;
+      height: 100vh;
+      border: none;
+      background-color: var(--primary-bg);
+    }
+   
+   
+    @media (max-width: 992px) {
+      .app-container {
+        flex-direction: column;
+        height: auto;
+      }
+     
+      .sidebar {
+        width: 100%;
+        height: auto;
+        padding: 1rem;
+      }
+     
+      .nav-items {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+      }
+     
+      .nav-item {
+        margin: 0 5px;
+        white-space: nowrap;
+      }
+     
+      .main-content {
+        height: calc(100vh - 200px);
+      }
+     
+      .pdf-frame {
+        height: calc(100vh - 200px);
+      }
+    }
+   
+    @media (max-width: 768px) {
+      .page-header {
+        padding: 1rem;
+      }
+     
+      .content-area {
+        padding: 1rem;
+      }
+     
+      .page-title {
+        font-size: 1.3rem;
+      }
+     
+      .table-custom thead th,
+      .table-custom tbody td {
+        padding: 0.75rem 1rem;
+      }
+
+      .search-container {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h4>Threat<span>Sentinel</span></h4>
+      </div>
+      <div class="nav-items">
+        <div class="nav-item">
+          <a href="infosec_main.html" class="nav-link">
+            <i class="fas fa-chart-dashboard"></i> Dashboard
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="infosec_ioc_list.html" class="nav-link">
+            <i class="fas fa-list"></i> IOC List
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="infosec_alerts.html" class="nav-link">
+            <i class="fas fa-bell"></i> Alerts
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="infosec_report.html" class="nav-link active">
+            <i class="fas fa-file-alt"></i> Report
+          </a>
+        </div>
+        
+        <div class="nav-item">
+          <a href="infosec_settings.html" class="nav-link">
+            <i class="fas fa-cog"></i> Settings
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="/logout" class="nav-link">
+            <i class="fas fa-sign-out-alt"></i> Log Out
+          </a>
+        </div>
+      </div>
+    </div>
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="page-header">
+        <h1 class="page-title">Security Reports</h1>
+        <p class="page-subtitle">View and download PDF security reports</p>
+      </div>
+      
+      <!-- Reports Table -->
+      <div class="content-area">
+        <!-- Search Bar -->
+        <div class="search-container">
+          <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Search reports by name...">
+          </div>
+        </div>
+
+        <div class="reports-table">
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>S.No.</th>
+                <th>Report Name</th>
+                <th>Type</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="reportsTableBody">
+              <!-- Loading State -->
+              <tr id="loadingRow">
+                <td colspan="4">
+                  <div class="loading-spinner">
+                    <div class="spinner-border" role="status">
+                      <span class="visually-hidden">Loading reports...</span>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- PDF Viewer Modal -->
+  <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+      <div class="modal-content" style="background-color: var(--primary-bg);">
+        <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+          <h5 class="modal-title" id="pdfModalLabel" style="color: var(--accent-color);">Report Viewer</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-0">
+          <iframe id="pdfViewer" class="pdf-frame" src="" style="width: 100%; height: 100%;"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let allReports = []; // Store all reports for search functionality
+
+    
+    async function fetchReports() {
+      try {
+        console.log("Fetching reports...");
+        const response = await fetch('/api/reports/folders');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch reports');
+        }
+        
+        const reports = await response.json();
+        console.log("Received reports:", reports);
+        return reports;
+      } catch (error) {
+        console.error('Error fetching reports:', error);
+        return [];
+      }
+    }
+
+    
+    async function populateReportsTable() {
+      const tableBody = document.getElementById('reportsTableBody');
+      const loadingRow = document.getElementById('loadingRow');
+      
+      // Show loading state
+      loadingRow.style.display = '';
+      
+      try {
+        console.log("=== DEBUG: Starting to fetch reports ===");
+        
+        
+        allReports = await fetchReports();
+        
+        console.log("=== DEBUG: Raw reports data ===", allReports);
+        console.log("=== DEBUG: Number of reports ===", allReports.length);
+        
+        
+        loadingRow.style.display = 'none';
+        
+        if (allReports.length === 0) {
+          console.log("=== DEBUG: No reports found ===");
+          
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="4">
+                <div class="empty-state">
+                  <i class="fas fa-file-pdf"></i>
+                  <h4>No Reports Found</h4>
+                  <p>No PDF reports found in the reports directory.</p>
+                  <p class="text-muted">Upload PDF files to the reports folder to see them here.</p>
+                </div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+        
+        console.log("=== DEBUG: Displaying reports ===", allReports);
+        
+        displayFilteredReports(allReports);
+        
+      } catch (error) {
+        console.error('=== DEBUG: Error in populateReportsTable ===', error);
+        loadingRow.style.display = 'none';
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="4">
+              <div class="empty-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h4>Error Loading Reports</h4>
+                <p>Failed to load reports. Please try again later.</p>
+                <p class="text-muted">Error: ${error.message}</p>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    
+    function displayFilteredReports(reports) {
+      const tableBody = document.getElementById('reportsTableBody');
+      
+      if (reports.length === 0) {
+        // Show no results state
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="4">
+              <div class="no-results">
+                <i class="fas fa-search"></i>
+                <h4>No Matching Reports</h4>
+                <p>No reports found matching your search criteria.</p>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      
+      tableBody.innerHTML = '';
+      
+     
+      reports.forEach((report, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${report}</td>
+          <td><span class="badge bg-danger">PDF</span></td>
+          <td>
+            <button class="btn btn-action btn-view" data-report="${report}">
+              <i class="fas fa-eye"></i> View
+            </button>
+            <button class="btn btn-action btn-download" data-report="${report}">
+              <i class="fas fa-download"></i> Download
+            </button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    
+    function filterReports() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+      
+      if (searchTerm === '') {
+        
+        displayFilteredReports(allReports);
+        return;
+      }
+      
+      
+      const filteredReports = allReports.filter(report => 
+        report.toLowerCase().includes(searchTerm)
+      );
+      
+      
+      displayFilteredReports(filteredReports);
+    }
+    
+    
+    async function viewReport(reportName) {
+      try {
+        console.log("Viewing report:", reportName);
+        
+        
+        const encodedReportName = encodeURIComponent(reportName);
+        const response = await fetch(`/api/reports/${encodedReportName}/pdf`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch PDF file');
+        }
+        
+        const data = await response.json();
+        const pdfPath = data.pdfPath;
+        
+        if (!pdfPath) {
+          alert('No PDF file found for this report');
+          return;
+        }
+        
+        console.log("Setting PDF source to:", pdfPath);
+        // Set the PDF source in the modal
+        document.getElementById('pdfViewer').src = pdfPath;
+        document.getElementById('pdfModalLabel').textContent = `Report: ${reportName}`;
+        
+        
+        const pdfModal = new bootstrap.Modal(document.getElementById('pdfModal'));
+        pdfModal.show();
+        
+      } catch (error) {
+        console.error('Error viewing report:', error);
+        alert('Error loading report. Please try again.');
+      }
+    }
+    
+    
+    async function downloadReport(reportName) {
+      try {
+        const encodedReportName = encodeURIComponent(reportName);
+        window.open(`/download-report/${encodedReportName}`, '_blank');
+      } catch (error) {
+        console.error('Error downloading report:', error);
+        alert('Error downloading report. Please try again.');
+      }
+    }
+    
+    
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('btn-view') || e.target.closest('.btn-view')) {
+        const button = e.target.classList.contains('btn-view') ? e.target : e.target.closest('.btn-view');
+        const reportName = button.getAttribute('data-report');
+        viewReport(reportName);
+      }
+      
+      if (e.target.classList.contains('btn-download') || e.target.closest('.btn-download')) {
+        const button = e.target.classList.contains('btn-download') ? e.target : e.target.closest('.btn-download');
+        const reportName = button.getAttribute('data-report');
+        downloadReport(reportName);
+      }
+    });
+    
+   
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log("Page loaded, initializing reports table...");
+      populateReportsTable();
+      
+     
+      const searchInput = document.getElementById('searchInput');
+      searchInput.addEventListener('input', filterReports);
+      
+      
+      searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          filterReports();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
