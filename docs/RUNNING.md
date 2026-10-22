@@ -22,7 +22,7 @@ heartbeat API, TAXII server, and PCAP parser watcher.
 python3 scripts/launcher.py all pipeline
 ```
 
-`pipeline` adds the Nmap, ARP, and ICMP detector watchers; detector-alert ingestion; CVSS scoring; rule generation; IOC/STIX generation; and STIX ingestion. Use this only when MongoDB is configured through `MONGODB_URI`.
+`pipeline` adds the Nmap, ARP, and ICMP detector watchers; detector-alert ingestion; CVSS scoring; rule generation; IOC/STIX generation; STIX ingestion; and organization intelligence synchronization. Use this only when MongoDB is configured through `MONGODB_URI`.
 
 Press `Ctrl+C` once to stop every process started by the launcher.
 

@@ -99,6 +99,12 @@ SERVICE_DEFINITIONS = {
         "cwd": PROJECT_ROOT,
         "port": None,
     },
+    "organization-sync": {
+        "label": "organization intelligence sync worker",
+        "module": "backend.app.workers.organization_sync_worker",
+        "cwd": PROJECT_ROOT,
+        "port": None,
+    },
 }
 
 DEFAULT_SERVICES = ("dashboard", "upload", "heartbeat", "taxii", "capture")
@@ -111,6 +117,7 @@ PIPELINE_SERVICES = (
     "rules",
     "ioc",
     "ingestion",
+    "organization-sync",
 )
 
 
