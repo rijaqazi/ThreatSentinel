@@ -51,4 +51,8 @@ data/rule_exports/
 data/uploads/
 data/credentials/
 
+# Generated dashboard exports are runtime artifacts, not source files.
+frontend/web/zip/
+frontend/web/REPORT/
+
 # Detector runtime evidence and parsed packet exports live in data/.

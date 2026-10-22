@@ -1,21 +1,35 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify, send_file, send_from_directory
-from flask_pymongo import PyMongo
+"""Authenticated Flask dashboard served with the migrated backend package."""
+
+from flask import Flask, jsonify, redirect, render_template, request, send_file, send_from_directory, session, url_for
 from pymongo import MongoClient
-import json
-from bson import json_util, ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 import time
 import os
 import glob
 import urllib.parse
-import secrets
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from pathlib import Path
 import certifi
-#hello
-app = Flask(__name__)
+
+from backend.app.core.paths import ensure_data_directories
+from backend.app.core.settings import PROJECT_ROOT, settings
+
+
+WEB_ROOT = PROJECT_ROOT / "frontend" / "web"
+TEMPLATES_DIR = WEB_ROOT / "templates"
+STATIC_DIR = WEB_ROOT / "static"
+
+if not TEMPLATES_DIR.is_dir() or not STATIC_DIR.is_dir():
+    raise RuntimeError("Dashboard templates and static files are missing from frontend/web.")
+
+ensure_data_directories()
+app = Flask(
+    __name__,
+    template_folder=str(TEMPLATES_DIR),
+    static_folder=str(STATIC_DIR),
+    static_url_path="/static",
+)
 @app.before_request
 def block_methods():
     allowed = ['GET', 'POST', 'HEAD']
@@ -35,23 +49,25 @@ limiter = Limiter(
 )
 
 
-app.secret_key = os.getenv("SECRET_KEY")
-if not app.secret_key:
+dashboard_secret = os.getenv("SECRET_KEY")
+if not dashboard_secret or dashboard_secret.startswith("change-me-"):
     raise RuntimeError("SECRET_KEY is not set. Add it to .env before starting the dashboard.")
+dashboard_cookie_secure = os.getenv("DASHBOARD_COOKIE_SECURE", "false").lower() in {"1", "true", "yes"}
 app.config.update(
-    SESSION_COOKIE_SECURE=True,        # Only over HTTPS (Render uses HTTPS)
-    SESSION_COOKIE_HTTPONLY=True,      # JS cannot read cookie
-    SESSION_COOKIE_SAMESITE='Lax',     # CSRF protection
-    PERMANENT_SESSION_LIFETIME=timedelta(minutes=30)
+    SECRET_KEY=dashboard_secret,
+    SESSION_COOKIE_SECURE=dashboard_cookie_secure,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    PERMANENT_SESSION_LIFETIME=timedelta(minutes=30),
 )
 
 
 @app.after_request
 def add_security_headers(response):
-    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-    response.headers['X-Content-Type-Options'] = 'nosniff'
-    response.headers['X-XSS-Protection'] = '1; mode=block'
-    response.headers['Referrer-Policy'] = 'no-referrer-when-downgrade'
+    response.headers["Cache-Control"] = "no-store"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
     return response
 
 
@@ -59,16 +75,16 @@ def add_security_headers(response):
 def internal_error(e):
     return "Internal server error", 500
 
-ATLAS_URI = os.getenv("MONGODB_URI")
+ATLAS_URI = settings.mongodb_uri
 if not ATLAS_URI:
-    raise RuntimeError("MONGODB_URI is not set. Export it before starting the application.")
+    raise RuntimeError("MONGODB_URI is not set. Add it to .env before starting the dashboard.")
 
 try:
     client = MongoClient(
         ATLAS_URI,
-        tls=True,  # Enable TLS/SSL
-        tlsCAFile=certifi.where(),  # Use certifi's CA certificates for SSL verification
-        serverSelectionTimeoutMS=10000,  # 10 seconds timeout
+        tls=True,
+        tlsCAFile=certifi.where(),
+        serverSelectionTimeoutMS=10000,
         connectTimeoutMS=10000,
         socketTimeoutMS=30000,
         retryWrites=True
@@ -76,21 +92,11 @@ try:
 
 
     client.admin.command('ping')
-    print("MongoDB Atlas connection successful!")
+    print("[+] Dashboard MongoDB connection established.")
 
-except Exception as e:
-    print(f"MongoDB connection failed: {e}")
-    # Fallback connection without SSL (for testing only)
-    try:
-        client = MongoClient(ATLAS_URI, serverSelectionTimeoutMS=5000)
-        print(" Using fallback MongoDB connection (without SSL verification)")
-    except Exception as e2:
-        print(f" Fallback connection also failed: {e2}")
-        client = None
-
-
-app.config["MONGO_URI"] = ATLAS_URI
-mongo = PyMongo(app)
+except Exception:
+    client = None
+    print("[!] Dashboard could not connect to MongoDB. Database pages will be unavailable.")
 
 
 if client:
@@ -126,30 +132,10 @@ def get_db_connections(username):
     return ioc_collection, alerts_collection, cvss_collection
 
 
-BASE_DIR = Path(os.getcwd())
-REPORTS_BASE_PATH = BASE_DIR / "REPORT"
-
-# Create directory if it doesn't exist
-os.makedirs(REPORTS_BASE_PATH, exist_ok=True)
-
-print(f" Reports path set to: {REPORTS_BASE_PATH}")
-print(f"Path exists: {os.path.exists(REPORTS_BASE_PATH)}")
-
-def verify_reports_path():
-    print(f"=== DEBUG: Checking REPORTS_BASE_PATH ===")
-    print(f"REPORTS_BASE_PATH: {REPORTS_BASE_PATH}")
-    print(f"Path exists: {os.path.exists(REPORTS_BASE_PATH)}")
-
-    if os.path.exists(REPORTS_BASE_PATH):
-        folders = os.listdir(REPORTS_BASE_PATH)
-        print(f"Files in path: {folders}")
-    else:
-        print("ERROR: REPORTS_BASE_PATH does not exist!")
-
-    return os.path.exists(REPORTS_BASE_PATH)
-
-
-verify_reports_path()
+# The report worker creates PDFs beneath REPORTS_OUTPUT_DIR/REPORT and ZIPs
+# beneath REPORTS_OUTPUT_DIR/zip.  The dashboard only exposes the PDF folder.
+REPORTS_BASE_PATH = settings.reports_output_dir / "REPORT"
+REPORTS_BASE_PATH.mkdir(parents=True, exist_ok=True)
 
 #
 
@@ -453,28 +439,6 @@ def get_report_folders():
     except Exception as e:
         print(f"ERROR in get_report_folders: {e}")
         return jsonify([])
-
-@app.route('/debug-reports')
-def debug_reports():
-    """Debug route to check reports path"""
-    try:
-        debug_info = {
-            "reports_base_path": str(REPORTS_BASE_PATH),
-            "path_exists": os.path.exists(REPORTS_BASE_PATH),
-            "current_directory": os.getcwd(),
-            "static_folder": app.static_folder
-        }
-
-        if os.path.exists(REPORTS_BASE_PATH):
-            debug_info["folders"] = os.listdir(REPORTS_BASE_PATH)
-            debug_info["folder_count"] = len(debug_info["folders"])
-        else:
-            debug_info["folders"] = []
-            debug_info["folder_count"] = 0
-
-        return jsonify(debug_info)
-    except Exception as e:
-        return jsonify({"error": str(e)})
 
 @app.route('/api/reports/<path:report_name>/pdf')
 def get_pdf_from_folder(report_name):
@@ -991,6 +955,14 @@ def infosec_notification_page():
 
     return render_template("infosec_notification.html", username=session['username'])
 
+def main():
+    """Run the dashboard locally without exposing Flask's development server."""
+    if settings.dashboard_bind_host not in {"127.0.0.1", "localhost", "::1"}:
+        raise RuntimeError(
+            "Do not expose the Flask development server. Use a production WSGI server behind TLS."
+        )
+    app.run(host=settings.dashboard_bind_host, port=settings.dashboard_port, debug=False)
+
+
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 5000))
-    app.run(debug=False, host="0.0.0.0", port=port)
+    main()

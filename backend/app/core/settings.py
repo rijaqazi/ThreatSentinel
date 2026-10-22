@@ -62,6 +62,8 @@ class Settings:
     file_server_password: Optional[str]
     backend_bind_host: str
     backend_port: int
+    dashboard_bind_host: str
+    dashboard_port: int
     heartbeat_bind_host: str
     heartbeat_server_url: str
     agent_company_id: str
@@ -106,6 +108,8 @@ class Settings:
             file_server_password=os.getenv("FILE_SERVER_PASSWORD"),
             backend_bind_host=os.getenv("BACKEND_BIND_HOST", "127.0.0.1"),
             backend_port=_positive_int("BACKEND_PORT", 8000),
+            dashboard_bind_host=os.getenv("DASHBOARD_BIND_HOST", "127.0.0.1"),
+            dashboard_port=_positive_int("DASHBOARD_PORT", 5000),
             heartbeat_bind_host=os.getenv("HEARTBEAT_BIND_HOST", "127.0.0.1"),
             heartbeat_server_url=os.getenv("HEARTBEAT_SERVER_URL", "http://127.0.0.1:5001/api"),
             agent_company_id=os.getenv("AGENT_COMPANY_ID", "alpha_corp"),

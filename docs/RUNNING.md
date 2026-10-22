@@ -13,7 +13,8 @@ source .venv/bin/activate
 python3 scripts/launcher.py all
 ```
 
-This starts the secure upload server, heartbeat API, TAXII server, and PCAP parser watcher.
+This starts the dashboard website at http://127.0.0.1:5000, the secure upload server,
+heartbeat API, TAXII server, and PCAP parser watcher.
 
 ## Full processing pipeline
 
@@ -24,6 +25,10 @@ python3 scripts/launcher.py all pipeline
 `pipeline` adds the Nmap, ARP, and ICMP detector watchers; detector-alert ingestion; CVSS scoring; rule generation; IOC/STIX generation; and STIX ingestion. Use this only when MongoDB is configured through `MONGODB_URI`.
 
 Press `Ctrl+C` once to stop every process started by the launcher.
+
+The dashboard needs both `SECRET_KEY` and `MONGODB_URI` in `.env`. Keep
+`DASHBOARD_COOKIE_SECURE=false` for local HTTP testing; set it to `true` only
+when a production WSGI server terminates HTTPS.
 
 ## Optional live capture monitor
 

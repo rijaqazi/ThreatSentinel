@@ -17,6 +17,12 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from backend.app.core.settings import load_env_file
 
 SERVICE_DEFINITIONS = {
+    "dashboard": {
+        "label": "dashboard website",
+        "module": "backend.app.web.dashboard",
+        "cwd": PROJECT_ROOT,
+        "port": 5000,
+    },
     "upload": {
         "label": "secure upload server",
         "module": "backend.app.services.rules.upload_service",
@@ -95,7 +101,7 @@ SERVICE_DEFINITIONS = {
     },
 }
 
-DEFAULT_SERVICES = ("upload", "heartbeat", "taxii", "capture")
+DEFAULT_SERVICES = ("dashboard", "upload", "heartbeat", "taxii", "capture")
 PIPELINE_SERVICES = (
     "detector-nmap",
     "detector-arp",
@@ -175,7 +181,7 @@ def parse_args():
         nargs="*",
         choices=[*SERVICE_DEFINITIONS, "all", "pipeline"],
         default=["all"],
-        help="Services to start. 'all' starts network services; add 'pipeline' for background workers.",
+        help="Services to start. 'all' starts the dashboard and local services; add 'pipeline' for background workers.",
     )
     return parser.parse_args()
 
