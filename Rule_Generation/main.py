@@ -4,6 +4,7 @@ import json, zipfile, os, shutil, glob
 import requests
 import hashlib
 from datetime import datetime
+import sys
 
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -12,7 +13,13 @@ REPORTS_DIR = os.path.join(RULE_GENERATION_DIR, "reports")
 RULES_REPO_DIR = os.path.join(RULE_GENERATION_DIR, "rules_repository")
 OUTPUT_DIR = os.path.join(os.getcwd(), "exported_rules")
 ZIP_OUTPUT_DIR = os.path.join(os.getcwd(), "extracted_rules_zip")
-SERVER_URL = "http://127.0.0.1:5000"
+sys.path.insert(0, PROJECT_ROOT)
+from backend.app.core.settings import load_env_file
+
+load_env_file(os.path.join(PROJECT_ROOT, ".env"))
+SERVER_URL = os.getenv("FILE_SERVER_URL", "http://127.0.0.1:5005")
+FILE_SERVER_USERNAME = os.getenv("FILE_SERVER_USERNAME")
+FILE_SERVER_PASSWORD = os.getenv("FILE_SERVER_PASSWORD")
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 os.makedirs(ZIP_OUTPUT_DIR, exist_ok=True)
@@ -81,33 +88,27 @@ def remove_file_from_server(rule_id):
 
 
 def upload_file_with_remove_upload(zip_file_path, rule_id):
-    """
-    Remove existing file from server (if exists) and upload new file
-    Returns True if successful, False otherwise
-    """
+    """Upload a generated ZIP to the authenticated local upload service."""
     try:
         filename = f"{rule_id}.zip"
-        
-        # Step 1: Remove existing file from server
-        print(f"[UPLOAD] Step 1: Removing existing {filename} from server...")
-        remove_success = remove_file_from_server(rule_id)
-        
-        if not remove_success:
-            print(f"[WARNING] Failed to remove existing file, but continuing with upload...")
-        
-        # Step 2: Upload new file
-        print(f"[UPLOAD] Step 2: Uploading new {filename}...")
+        if not FILE_SERVER_USERNAME or not FILE_SERVER_PASSWORD:
+            messagebox.showerror(
+                "Upload configuration required",
+                "Set FILE_SERVER_USERNAME and FILE_SERVER_PASSWORD in .env before uploading.",
+            )
+            return False
+
+        print(f"[UPLOAD] Uploading {filename} to {SERVER_URL}...")
         url = SERVER_URL.rstrip("/") + "/upload"
         with open(zip_file_path, "rb") as fh:
             files = {"file": (filename, fh, "application/zip")}
-            data = {
-                "rule_id": rule_id,
-                "timestamp": datetime.now().isoformat()
-            }
-            
-            r = requests.post(url, files=files, data=data, timeout=30)
-        
-        # Check response
+            r = requests.post(
+                url,
+                files=files,
+                auth=(FILE_SERVER_USERNAME, FILE_SERVER_PASSWORD),
+                timeout=30,
+            )
+
         if r.status_code in (200, 201):
             try:
                 response_data = r.json()
