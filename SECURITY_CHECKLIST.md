@@ -16,7 +16,7 @@ Before sharing, demonstrating, or deploying this project, verify the following:
 ```bash
 grep -RInE --exclude-dir=.venv --exclude-dir=venv --include='*.py' 'password123|user123' .
 grep -RIn --exclude-dir=.venv --exclude-dir=venv --include='*.py' 'mongodb+srv://' .
-git ls-files .env Rule_Generation/creds.json
+git ls-files .env data/credentials/upload_service.json
 git log -S 'mongodb+srv://' --all -- '*.py'
 ```
 

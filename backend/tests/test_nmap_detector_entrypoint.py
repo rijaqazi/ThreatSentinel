@@ -2,7 +2,7 @@
 
 import unittest
 
-from backend.app.workers.detectors.nmap_detector import LEGACY_DETECTOR, run_detector
+from backend.app.workers.detectors.nmap_detector import DETECTOR_ENGINE, run_detector
 
 
 class NmapDetectorEntrypointTests(unittest.TestCase):
@@ -15,5 +15,5 @@ class NmapDetectorEntrypointTests(unittest.TestCase):
 
         result = run_detector(["sample.json", "--log", "output.log"], runner)
         self.assertEqual(result.returncode, 0)
-        self.assertEqual(commands[0][0][1], str(LEGACY_DETECTOR))
+        self.assertEqual(commands[0][0][1], str(DETECTOR_ENGINE))
         self.assertFalse(commands[0][1].get("shell", False))

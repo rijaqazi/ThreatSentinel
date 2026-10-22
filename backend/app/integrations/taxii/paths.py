@@ -11,5 +11,5 @@ def _project_path(variable, default):
     return value if value.is_absolute() else settings.project_root / value
 
 
-TAXII_BUNDLES_DIR = _project_path("TAXII_BUNDLES_DIR", "ioc/stix_output")
+TAXII_BUNDLES_DIR = _project_path("TAXII_BUNDLES_DIR", "data/stix")
 IOC_PULL_OUTPUT_DIR = _project_path("IOC_PULL_OUTPUT_DIR", "data/iocs")

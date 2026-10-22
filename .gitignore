@@ -42,22 +42,13 @@ logs/
 .uploaded_files.txt
 data/*
 !data/.gitkeep
+!data/README.md
 
-# Rule-generation runtime artifacts (existing tracked files are cleaned separately)
-Rule_Generation/uploads/
-Rule_Generation/reports/
-Rule_Generation/rules_repository/
+# Rule-generation runtime artifacts
+data/rules/
+data/reports/
+data/rule_exports/
+data/uploads/
+data/credentials/
 
-# Detector runtime evidence and parsed packet exports
-arp/*_parsed.json
-arp/alerts*.log
-icmp/*_parsed.json
-icmp/icmp_alerts.json
-icmp/alerts*.log
-nmap/*_parsed.json
-nmap/*.json
-nmap/alerts*.log
-new_detection/*_parsed.json
-new_detection/*.log
-new_detection/tshark_captures/*
-!new_detection/tshark_captures/parse_pcap.py
+# Detector runtime evidence and parsed packet exports live in data/.

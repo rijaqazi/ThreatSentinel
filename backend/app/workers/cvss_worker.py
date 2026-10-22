@@ -24,3 +24,14 @@ def run_cvss_automation():
             scores.insert_one(process_alert(alert))
             print(f"[+] CVSS score added for alert {alert_id}.")
         time.sleep(settings.cvss_poll_seconds)
+
+
+def main():
+    try:
+        run_cvss_automation()
+    except KeyboardInterrupt:
+        print("[+] CVSS automation stopped.")
+
+
+if __name__ == "__main__":
+    main()

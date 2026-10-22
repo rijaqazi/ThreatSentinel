@@ -19,20 +19,20 @@ from backend.app.core.settings import load_env_file
 SERVICE_DEFINITIONS = {
     "upload": {
         "label": "secure upload server",
-        "script": PROJECT_ROOT / "Rule_Generation" / "secure_server.py",
-        "cwd": PROJECT_ROOT / "Rule_Generation",
+        "module": "backend.app.services.rules.upload_service",
+        "cwd": PROJECT_ROOT,
         "port": 5005,
     },
     "heartbeat": {
         "label": "heartbeat server",
-        "script": PROJECT_ROOT / "agent" / "heartbeat_server.py",
-        "cwd": PROJECT_ROOT / "agent",
+        "module": "backend.app.api.v1.heartbeats",
+        "cwd": PROJECT_ROOT,
         "port": 5001,
     },
     "taxii": {
         "label": "TAXII server",
-        "script": PROJECT_ROOT / "ioc" / "taxi_server.py",
-        "cwd": PROJECT_ROOT / "ioc",
+        "module": "backend.app.integrations.taxii.server",
+        "cwd": PROJECT_ROOT,
         "port": 5002,
     },
     "capture": {
@@ -70,13 +70,13 @@ SERVICE_DEFINITIONS = {
     },
     "cvss": {
         "label": "CVSS scoring worker",
-        "script": PROJECT_ROOT / "cvss" / "cvss_automation.py",
+        "module": "backend.app.workers.cvss_worker",
         "cwd": PROJECT_ROOT,
         "port": None,
     },
     "rules": {
         "label": "rule generation worker",
-        "script": PROJECT_ROOT / "Rule_Generation" / "rule_automation.py",
+        "module": "backend.app.workers.rule_worker",
         "args": ["monitor"],
         "cwd": PROJECT_ROOT,
         "port": None,
@@ -116,9 +116,9 @@ def port_is_available(port):
 
 def start_service(name):
     service = SERVICE_DEFINITIONS[name]
-    if name == "upload" and not (service["cwd"] / "creds.json").is_file():
+    if name == "upload" and not (PROJECT_ROOT / "data" / "credentials" / "upload_service.json").is_file():
         raise RuntimeError(
-            "Upload credentials are not initialized. Run 'python3 Rule_Generation/secure_server.py' "
+            "Upload credentials are not initialized. Run 'python3 -m backend.app.services.rules.upload_service' "
             "once, create the credentials, stop it, then rerun the launcher."
         )
 

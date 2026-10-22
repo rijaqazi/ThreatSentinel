@@ -6,12 +6,12 @@ import time
 import uuid
 from pathlib import Path
 
-from ..core.settings import PROJECT_ROOT
+from ..core.paths import RULES_DIR
 from ..repositories.rule_repository import RuleRepository
 from ..services.rules.rule_policy import ACTIONABLE_PRIORITIES, build_rule, decide_action
 
 
-DEFAULT_RULES_DIR = PROJECT_ROOT / "Rule_Generation" / "rules_repository"
+DEFAULT_RULES_DIR = RULES_DIR
 DEFAULT_CHECK_INTERVAL = 30
 
 
@@ -142,7 +142,7 @@ def main():
     else:
         print("Running one-time rule generation...")
         worker.process_all_alerts_once()
-        print("\nTo run in continuous monitoring mode, use: python3 Rule_Generation/rule_automation.py monitor")
+        print("\nTo monitor continuously, use: python3 -m backend.app.workers.rule_worker monitor")
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@
 
 from flask import Blueprint, Flask, current_app, jsonify, request
 
+from ...core.settings import settings
 from ...services.alerts.heartbeat_service import create_heartbeat_service
 
 
@@ -63,3 +64,16 @@ def create_legacy_heartbeat_app():
         return jsonify({"service": "heartbeat", "api": "/api"})
 
     return app
+
+
+def main():
+    """Run the standalone heartbeat service used by the local launcher."""
+    if settings.heartbeat_bind_host not in {"127.0.0.1", "localhost", "::1"}:
+        raise RuntimeError(
+            "Do not expose the Flask development server. Use a production WSGI server behind TLS."
+        )
+    create_legacy_heartbeat_app().run(host=settings.heartbeat_bind_host, port=5001, debug=False)
+
+
+if __name__ == "__main__":
+    main()

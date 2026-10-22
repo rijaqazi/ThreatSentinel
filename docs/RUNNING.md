@@ -31,7 +31,7 @@ The live monitor is opt-in because it needs TShark capture permissions and an ex
 
 ```bash
 tshark -D
-python3 new_detection/monitor_tshark_trigger.py --interface enp0s3
+python3 -m backend.app.workers.capture.protocol_monitor --interface enp0s3
 ```
 
 Replace `enp0s3` with an interface reported by `tshark -D`, or set `CAPTURE_INTERFACE` in `.env`.
@@ -44,3 +44,15 @@ curl http://127.0.0.1:8000/api/v1/health
 ```
 
 The expected response includes `"status": "ok"`.
+
+## Desktop rule editor
+
+With the secure upload service already running through the launcher, open the
+current desktop rule editor with:
+
+```bash
+python3 frontend/desktop/rule_editor.py
+```
+
+Generated rules, reports, ZIP files, and uploaded archives are stored under
+`data/` and are intentionally not committed to Git.

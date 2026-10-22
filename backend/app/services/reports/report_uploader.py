@@ -6,11 +6,12 @@ import hashlib
 import time
 from pathlib import Path
 
-from ...core.settings import PROJECT_ROOT, settings
+from ...core.paths import RULE_EXPORTS_DIR
+from ...core.settings import settings
 from .report_paths import report_output_paths
 
 
-DEFAULT_EXTRACTED_RULES_DIR = PROJECT_ROOT / "Rule_Generation" / "extracted_rules_zip"
+DEFAULT_EXTRACTED_RULES_DIR = RULE_EXPORTS_DIR
 
 
 def sha256_file(path: Path) -> str:

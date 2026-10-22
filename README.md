@@ -81,7 +81,7 @@ python3 scripts/launcher.py upload
 python3 scripts/launcher.py capture
 ```
 
-`python3 agent/run.py` remains supported and delegates to the same launcher.
+All runtime services are started from `python3 scripts/launcher.py`; individual modules are documented in `docs/WORKFLOWS.md`.
 
 ### Central backend API
 

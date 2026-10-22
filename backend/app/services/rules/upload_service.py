@@ -1,8 +1,7 @@
 """Authenticated ZIP upload service used by the rule-generation workflow.
 
-Runtime files deliberately remain in ``Rule_Generation`` for backwards
-compatibility.  The HTTP implementation lives here so new backend code has a
-single, importable service boundary.
+Runtime files live under the ignored ``data/`` directory. The HTTP
+implementation is an importable backend service boundary.
 """
 
 import getpass
@@ -19,12 +18,12 @@ from pathlib import Path
 
 from flask import Flask, jsonify, redirect, request, send_from_directory, url_for
 
-from ...core.settings import PROJECT_ROOT, settings
+from ...core.paths import CREDENTIALS_DIR, RULE_UPLOADS_DIR
+from ...core.settings import settings
 
 
-RULE_GENERATION_DIR = PROJECT_ROOT / "Rule_Generation"
-DEFAULT_UPLOAD_DIR = RULE_GENERATION_DIR / "uploads"
-DEFAULT_CREDS_FILE = RULE_GENERATION_DIR / "creds.json"
+DEFAULT_UPLOAD_DIR = RULE_UPLOADS_DIR
+DEFAULT_CREDS_FILE = CREDENTIALS_DIR / "upload_service.json"
 PBKDF2_ROUNDS = 200_000
 ALLOWED_UPLOAD_EXTENSIONS = {".zip"}
 

@@ -126,7 +126,7 @@ class Settings:
             ioc_whitelist_file=_project_path("IOC_WHITELIST_FILE", PROJECT_ROOT / "data" / "iocs" / "whitelist.json"),
             ioc_poll_seconds=_positive_int("IOC_POLL_SECONDS", 30),
             file_server_bind_host=os.getenv("FILE_SERVER_BIND_HOST", "127.0.0.1"),
-            reports_output_dir=_project_path("REPORTS_OUTPUT_DIR", PROJECT_ROOT / "Rule_Generation" / "reports"),
+            reports_output_dir=_project_path("REPORTS_OUTPUT_DIR", PROJECT_ROOT / "data" / "reports"),
             report_download_dir=_project_path("REPORT_DOWNLOAD_DIR", PROJECT_ROOT / "data" / "downloads"),
             max_upload_bytes=_positive_int("MAX_UPLOAD_BYTES", 16 * 1024 * 1024),
             max_taxii_request_bytes=_positive_int("MAX_TAXII_REQUEST_BYTES", 5 * 1024 * 1024),

@@ -3,10 +3,8 @@
 from pathlib import Path
 from typing import Optional, Union
 
-from ...core.settings import PROJECT_ROOT, settings
-
-
-RULES_DIR = PROJECT_ROOT / "Rule_Generation" / "rules_repository"
+from ...core.paths import RULES_DIR
+from ...core.settings import settings
 
 
 def report_output_paths(base_dir: Optional[Union[str, Path]] = None):
