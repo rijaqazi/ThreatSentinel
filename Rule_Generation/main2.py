@@ -12,8 +12,10 @@ import json, zipfile, os, shutil, glob
 import hashlib
 from datetime import datetime
 
-RULES_REPO_DIR = "/home/defender/Desktop/Rule_Generation/rules_repository"
-REPORTS_DIR = "/home/defender/Desktop/Rule_Generation/reports/REPORT"
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+RULE_GENERATION_DIR = os.path.join(PROJECT_ROOT, "Rule_Generation")
+RULES_REPO_DIR = os.path.join(RULE_GENERATION_DIR, "rules_repository")
+REPORTS_DIR = os.path.join(RULE_GENERATION_DIR, "reports", "REPORT")
 OUTPUT_DIR = os.path.join(os.getcwd(), "exported_rules")
 ZIP_OUTPUT_DIR = os.path.join(os.getcwd(), "extracted_rules_zip")
 

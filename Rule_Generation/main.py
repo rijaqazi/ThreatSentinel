@@ -6,8 +6,10 @@ import hashlib
 from datetime import datetime
 
 
-REPORTS_DIR = "/home/defender/Desktop/Rule_Generation/reports"
-RULES_REPO_DIR = "/home/defender/Desktop/Rule_Generation/rules_repository"
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+RULE_GENERATION_DIR = os.path.join(PROJECT_ROOT, "Rule_Generation")
+REPORTS_DIR = os.path.join(RULE_GENERATION_DIR, "reports")
+RULES_REPO_DIR = os.path.join(RULE_GENERATION_DIR, "rules_repository")
 OUTPUT_DIR = os.path.join(os.getcwd(), "exported_rules")
 ZIP_OUTPUT_DIR = os.path.join(os.getcwd(), "extracted_rules_zip")
 SERVER_URL = "http://127.0.0.1:5000"
