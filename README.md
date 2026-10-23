@@ -103,7 +103,7 @@ You also need a MongoDB Atlas cluster (or a reachable MongoDB deployment), an At
 
 ```bash
 cd ~/Desktop
-git clone https://github.com/rijaqazi/rijaqazi.git ThreatSentinel
+git clone https://github.com/rijaqazi/ThreatSentinel.git ThreatSentinel
 cd ThreatSentinel
 
 python3 -m venv .venv
@@ -245,13 +245,7 @@ python3 -m pip check
 
 ## Documentation
 
-- [Complete Project Guide](docs/ThreatSentinel_Project_Guide.docx) - detailed architecture, folder reference, installation, operation, testing, troubleshooting, and moving the project to a new Ubuntu laptop.
 - [Architecture](docs/ARCHITECTURE.md)
 - [Running instructions](docs/RUNNING.md)
 - [Workflow command map](docs/WORKFLOWS.md)
-- [Migration notes](docs/MIGRATION.md)
 - [Security checklist](SECURITY_CHECKLIST.md)
-
-## Moving to a new Ubuntu laptop
-
-Use a fresh clone and create a fresh `.venv` and `.env`. Do not copy the old `.venv`, `.env`, or `data/credentials/`. MongoDB Atlas data remains in the cloud; add the new laptop public IP to Atlas Network Access and configure the new `.env` with valid credentials. The complete migration checklist is in the Project Guide above.
