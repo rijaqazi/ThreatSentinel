@@ -29,6 +29,38 @@ PCAP capture
 - Authenticated local rule-upload service and protected TAXII endpoints.
 - Pinned Python dependencies, environment-based secrets, and ignored runtime data.
 
+## System diagrams
+
+### System architecture
+
+<img width="1607" height="979" alt="ThreatSentinel system architecture" src="https://github.com/user-attachments/assets/626037ed-3968-452f-a6a8-0828054571b3" />
+
+### Deployment architecture
+
+<img width="1567" height="1004" alt="ThreatSentinel deployment architecture" src="https://github.com/user-attachments/assets/0812f6f6-243e-45f4-a920-4ba0e3c09967" />
+
+## Dashboard screenshots
+
+### Dashboard
+
+<img width="1664" height="945" alt="ThreatSentinel dashboard" src="https://github.com/user-attachments/assets/28772fc1-03ce-412e-9c51-ef9ad59694ca" />
+
+### IOC list
+
+<img width="1561" height="841" alt="ThreatSentinel IOC list" src="https://github.com/user-attachments/assets/9fc6581b-4767-4bb5-933e-57b38225b2cc" />
+
+### Alerts
+
+<img width="1563" height="838" alt="ThreatSentinel alerts" src="https://github.com/user-attachments/assets/f1f9be95-f631-416a-8710-040f83351ea8" />
+
+### Alert notifications
+
+<img width="1706" height="922" alt="ThreatSentinel alert notification" src="https://github.com/user-attachments/assets/33b6b369-2027-460f-a0fe-649358a564a5" />
+
+### Rule report
+
+<img width="1605" height="829" alt="ThreatSentinel rule report" src="https://github.com/user-attachments/assets/95f4208d-cc75-424b-a34d-a9ad5670663d" />
+
 ## Final structure
 
 ```text
