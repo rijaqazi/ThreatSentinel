@@ -51,6 +51,12 @@ data/rule_exports/
 data/uploads/
 data/credentials/
 
+# Obsolete local folders retained only for migration reference.
+# Final runtime output belongs under data/.
+/Rule_Generation/
+/exported_rules/
+/extracted_rules_zip/
+
 # Generated dashboard exports are runtime artifacts, not source files.
 frontend/web/zip/
 frontend/web/REPORT/
